@@ -66,6 +66,7 @@ EOF
 		AddPackage git themes luci-theme-argon jerrykuku 18.06
 		AddPackage git lean luci-theme-edge garypang13 18.06
 		AddPackage git themes luci-theme-edge garypang13 18.06
+		AddPackage git other luci-app-unblockneteasemusic UnblockNeteaseMusic
 		AddPackage svn apps minieap immortalwrt/packages/branches/openwrt-18.06/net
 		AddPackage svn other luci-app-openclash vernesong/OpenClash/branches/dev
 		AddPackage git lean luci-app-argon-config jerrykuku master
