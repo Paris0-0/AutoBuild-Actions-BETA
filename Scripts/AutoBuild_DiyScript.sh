@@ -7,7 +7,7 @@ Firmware_Diy_Core() {
 	Author=AUTO
 	Author_URL=AUTO
 	Default_Flag=AUTO
-	Default_IP="192.168.1.1"
+	Default_IP="192.168.123.1"
 	Default_Title="Powered by AutoBuild-Actions"
 
 	Short_Fw_Date=true
@@ -64,6 +64,8 @@ EOF
 
 		rm -r ${FEEDS_LUCI}/luci-theme-argon*
 		AddPackage git themes luci-theme-argon jerrykuku 18.06
+		AddPackage git lean luci-theme-edge garypang13 18.06
+		AddPackage git themes luci-theme-edge garypang13 18.06
 		AddPackage svn apps minieap immortalwrt/packages/branches/openwrt-18.06/net
 		AddPackage svn other luci-app-openclash vernesong/OpenClash/branches/dev
 		AddPackage git lean luci-app-argon-config jerrykuku master
