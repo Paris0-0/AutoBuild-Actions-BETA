@@ -1,5 +1,5 @@
 #!/bin/bash
-# AutoBuild Module by Hyy2001 <https://github.com/Hyy2001X/AutoBuild-Actions>
+# AutoBuild Module by Hyy2001 <https://github.com/Hyy2001X/AutoBuild-Actions-BETA>
 # AutoBuild Functions
 
 Firmware_Diy_Before() {
@@ -83,7 +83,7 @@ Firmware_Diy_Before() {
 			TARGET_FLAG="${Default_Flag}"
 		fi
 	fi
-	if [[ ! ${Tempoary_FLAG} =~ (\"|=|-|_|\.|\#|\|) && ${Tempoary_FLAG} =~ [a-zA-Z0-9] ]]
+	if [[ ! ${Tempoary_FLAG} =~ (\"|=|-|_|\.|\#|\|) && ${Tempoary_FLAG} =~ [a-zA-Z0-9] && ${Tempoary_FLAG} != AUTO ]]
 	then
 		TARGET_FLAG="${Tempoary_FLAG}"
 	fi
