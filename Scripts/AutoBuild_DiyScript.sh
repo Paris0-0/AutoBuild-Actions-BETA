@@ -81,7 +81,6 @@ EOF
 		AddPackage git other luci-app-argon-config jerrykuku master
 		AddPackage git other helloworld fw876 main
 		AddPackage git themes luci-theme-neobird thinktip main
-		svn co https://github.com/immortalwrt/luci/branches/openwrt-18.06-k5.4/themes/luci-theme-bootstrap-mod ${FEEDS_LUCI}/luci-theme-bootstrap-mod
 		
 		case "${TARGET_BOARD}" in
 		ramips)
@@ -101,7 +100,7 @@ EOF
 			AddPackage git passwall2-luci openwrt-passwall2 xiaorouji main
 			#rm -rf packages/lean/autocore
 			#AddPackage git lean autocore-modify Hyy2001X master
-			sed -i -- 's:/bin/ash:'/bin/bash':g' ${BASE_FILES}/etc/passwd
+			sed -i -- 's:/bin/ash:'/bin/zsh':g' ${BASE_FILES}/etc/passwd
 
 			singbox_version="1.7.2"
 			hysteria_version="2.2.3"

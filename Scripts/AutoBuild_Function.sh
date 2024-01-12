@@ -123,14 +123,7 @@ EOF
 Firmware_Diy_Main() {
 	ECHO "[Firmware_Diy_Main] Starting ..."
 	CD ${WORK}
-	chmod 777 -R ${Scripts} ${CustomFiles}
-	if [[ ${AutoBuild_Features} == true ]]
-	then
-		AddPackage git other AutoBuild-Packages Hyy2001X master
-		echo -e "\nCONFIG_PACKAGE_luci-app-autoupdate=y" >> ${CONFIG_FILE}
-		for i in ${GITHUB_ENV} $(PKG_Finder d package AutoBuild-Packages)/autoupdate/files/etc/autoupdate/default
-		do
-			cat >> ${i} <<EOF
+	cat >> ${GITHUB_ENV} <<EOF
 Author=${Author}
 Github=${Github}
 TARGET_PROFILE=${TARGET_PROFILE}
@@ -143,8 +136,25 @@ OP_REPO=${OP_REPO}
 OP_BRANCH=${OP_BRANCH}
 
 EOF
-		done ; unset i
+	chmod 777 -R ${Scripts} ${CustomFiles}
+	if [[ ${AutoBuild_Features} == true ]]
+	then
+		AddPackage git other AutoBuild-Packages Hyy2001X master
+		echo -e "\nCONFIG_PACKAGE_luci-app-autoupdate=y" >> ${CONFIG_FILE}
 		AutoUpdate_Version=$(awk -F '=' '/Version/{print $2}' $(PKG_Finder d package AutoBuild-Packages)/autoupdate/files/bin/autoupdate | awk 'NR==1')
+		cat >> $(PKG_Finder d package AutoBuild-Packages)/autoupdate/files/etc/autoupdate/default <<EOF
+Author=${Author}
+Github=${Github}
+TARGET_PROFILE=${TARGET_PROFILE}
+TARGET_BOARD=${TARGET_BOARD}
+TARGET_SUBTARGET=${TARGET_SUBTARGET}
+TARGET_FLAG=${TARGET_FLAG}
+OP_VERSION=${OP_VERSION}
+OP_AUTHOR=${OP_AUTHOR}
+OP_REPO=${OP_REPO}
+OP_BRANCH=${OP_BRANCH}
+
+EOF
 		Copy ${CustomFiles}/Depends/tools ${BASE_FILES}/bin
 		Copy ${CustomFiles}/Depends/profile ${BASE_FILES}/etc
 		Copy ${CustomFiles}/Depends/base-files-essential ${BASE_FILES}/lib/upgrade/keep.d
@@ -200,6 +210,7 @@ EOF
 			sed -i "s/${Old_IP}/${Default_IP}/g" ${BASE_FILES}/bin/config_generate
 		fi
 	fi
+ 	echo -e "### VARIABLE LIST ###\n$(cat ${GITHUB_ENV})\n"
 	ECHO "[Firmware_Diy_Main] Done"
 }
 
@@ -309,12 +320,14 @@ EOF
 
 Firmware_Diy_End() {
 	ECHO "[Firmware_Diy_End] Starting ..."
+	source ${GITHUB_ENV}
 	ECHO "[$(date "+%H:%M:%S")] Actions Avaliable: $(df -h | grep "/dev/root" | awk '{printf $4}')"
 	cd ${WORK}
+	echo -e "### FIRMWARE OUTPUT ###"
+	du -ah bin/targets | egrep -v "${Regex_Skip}"
 	MKDIR ${WORK}/bin/Firmware
 	Fw_Path="${WORK}/bin/targets/${TARGET_BOARD}/${TARGET_SUBTARGET}"
-	cd ${Fw_Path}
-	echo -e "### FIRMWARE OUTPUT ###\n$(ls -1)\n"
+	cd "${Fw_Path}"
 	case "${TARGET_BOARD}" in
 	x86)
 		if [[ ${x86_Full_Images} == true ]]
