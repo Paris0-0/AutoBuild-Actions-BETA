@@ -95,12 +95,12 @@ EOF
 		;;
 		x86_64)
 			Copy ${CustomFiles}/Depends/cpuset ${BASE_FILES}/bin
-			AddPackage git passwall-depends openwrt-passwall-packages xiaorouji main
-			AddPackage git passwall-luci openwrt-passwall xiaorouji main
-			AddPackage git passwall2-luci openwrt-passwall2 xiaorouji main
+			# AddPackage passwall-depends xiaorouji openwrt-passwall-packages main
+			# AddPackage passwall-luci xiaorouji openwrt-passwall main
+			AddPackage passwall2-luci xiaorouji openwrt-passwall2 main
 			#rm -rf packages/lean/autocore
-			#AddPackage git lean autocore-modify Hyy2001X master
-			sed -i -- 's:/bin/ash:'/bin/zsh':g' ${BASE_FILES}/etc/passwd
+			#AddPackage lean Hyy2001X autocore-modify master
+			sed -i -- 's:/bin/ash:'/bin/bash':g' ${BASE_FILES}/etc/passwd
 
 			singbox_version="1.7.2"
 			hysteria_version="2.2.3"
@@ -132,18 +132,29 @@ EOF
 			# ReleaseDL https://api.github.com/repos/Loyalsoldier/v2ray-rules-dat/releases/latest geoip.dat ${BASE_FILES}/usr/v2ray
 		;;
 		xiaomi_redmi-router-ax6s)
-			AddPackage git passwall-depends openwrt-passwall-packages xiaorouji main
-			AddPackage git passwall-luci openwrt-passwall xiaorouji main
+			AddPackage passwall-depends xiaorouji openwrt-passwall-packages main
+			AddPackage passwall-luci xiaorouji openwrt-passwall main
 		;;
 		esac
 	;;
 	immortalwrt/immortalwrt*)
 		case "${TARGET_PROFILE}" in
 		x86_64)
-			AddPackage git passwall2-luci openwrt-passwall2 xiaorouji main
+			Copy ${CustomFiles}/Depends/cpuset ${BASE_FILES}/bin
+			sed -i -- 's:/bin/ash:'/bin/bash':g' ${BASE_FILES}/etc/passwd
+			AddPackage passwall2-luci xiaorouji openwrt-passwall2 main
+			AddPackage other fw876 helloworld main
+			AddPackage other sbwml luci-app-mosdns v5
 		;;
 		esac
-		# sed -i "s?/bin/login?/usr/libexec/login.sh?g" ${FEEDS_PKG}/ttyd/files/ttyd.config
+		sed -i "s?/bin/login?/usr/libexec/login.sh?g" ${FEEDS_PKG}/ttyd/files/ttyd.config
+	;;
+	padavanonly/immortalwrtARM*)
+		case "${TARGET_PROFILE}" in
+		xiaomi_redmi-router-ax6s)
+			:
+		;;
+		esac
 	;;
 	esac
 }
