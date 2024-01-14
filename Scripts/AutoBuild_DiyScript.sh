@@ -67,20 +67,19 @@ EOF
 		# sed -i '/uci commit luci/i\uci set luci.main.mediaurlbase="/luci-static/argon-mod"' $(PKG_Finder d package default-settings)/files/zzz-default-settings
 
 		rm -r ${FEEDS_LUCI}/luci-theme-argon*
-		AddPackage git themes luci-theme-argon jerrykuku 18.06
-		AddPackage git lean luci-theme-edge garypang13 18.06
-		AddPackage git themes luci-theme-edge garypang13 18.06
-		AddPackage git other luci-app-unblockneteasemusic UnblockNeteaseMusic
-		AddPackage svn apps minieap immortalwrt/packages/branches/openwrt-18.06/net
-		AddPackage git other luci-app-ikoolproxy iwrt main
-		AddPackage git themes luci-theme-neobird thinktip main
-		AddPackage git other luci-app-smartdns pymumu lede
-		AddPackage git other openwrt-passwall2 xiaorouji main
+		AddPackage themes luci-theme-argon jerrykuku 18.06
+		AddPackage lean luci-theme-edge garypang13 18.06
+		AddPackage themes luci-theme-edge garypang13 18.06
+		AddPackage other luci-app-unblockneteasemusic UnblockNeteaseMusic
+		AddPackage other luci-app-ikoolproxy iwrt main
+		AddPackage themes luci-theme-neobird thinktip main
+		AddPackage other luci-app-smartdns pymumu lede
+		AddPackage other openwrt-passwall2 xiaorouji main
 
-		AddPackage git other OpenClash vernesong dev
-		AddPackage git other luci-app-argon-config jerrykuku master
-		AddPackage git other helloworld fw876 main
-		AddPackage git themes luci-theme-neobird thinktip main
+		AddPackage other OpenClash vernesong dev
+		AddPackage other luci-app-argon-config jerrykuku master
+		AddPackage other helloworld fw876 main
+		AddPackage themes luci-theme-neobird thinktip main
 		
 		case "${TARGET_BOARD}" in
 		ramips)
