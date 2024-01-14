@@ -73,10 +73,10 @@ EOF
 		AddPackage other iwrt luci-app-ikoolproxy main
 		AddPackage other pymumu luci-app-smartdns lede
 
-		AddPackage other OpenClash vernesong dev
-		AddPackage other luci-app-argon-config jerrykuku master
-		AddPackage other helloworld fw876 main
-		AddPackage themes luci-theme-neobird thinktip main
+		AddPackage other vernesong OpenClash  dev
+		AddPackage other jerrykuku luci-app-argon-config  master
+		AddPackage other fw876 helloworld  main
+		AddPackage themes thinktip luci-theme-neobird  main
 		
 		case "${TARGET_BOARD}" in
 		ramips)
