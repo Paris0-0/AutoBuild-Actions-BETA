@@ -67,14 +67,11 @@ EOF
 		# sed -i '/uci commit luci/i\uci set luci.main.mediaurlbase="/luci-static/argon-mod"' $(PKG_Finder d package default-settings)/files/zzz-default-settings
 
 		rm -r ${FEEDS_LUCI}/luci-theme-argon*
-		AddPackage themes luci-theme-argon jerrykuku 18.06
-		AddPackage lean luci-theme-edge garypang13 18.06
-		AddPackage themes luci-theme-edge garypang13 18.06
-		AddPackage other luci-app-unblockneteasemusic UnblockNeteaseMusic
-		AddPackage other luci-app-ikoolproxy iwrt main
-		AddPackage themes luci-theme-neobird thinktip main
-		AddPackage other luci-app-smartdns pymumu lede
-		AddPackage other openwrt-passwall2 xiaorouji main
+		AddPackage themes jerrykuku luci-theme-argon 18.06
+		AddPackage themes garypang13 luci-theme-edge 18.06
+		AddPackage other UnblockNeteaseMusic luci-app-unblockneteasemusic
+		AddPackage other iwrt luci-app-ikoolproxy main
+		AddPackage other pymumu luci-app-smartdns lede
 
 		AddPackage other OpenClash vernesong dev
 		AddPackage other luci-app-argon-config jerrykuku master
