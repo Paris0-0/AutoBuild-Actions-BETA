@@ -39,16 +39,22 @@ Firmware_Diy() {
 	# ${TARGET_PROFILE}		设备名称
 	# ${TARGET_BOARD}			设备架构
 	# ${TARGET_FLAG}			固件名称后缀
+	# ${CONFIG_FILE}			配置文件
 
-	# ${WORK}				OpenWrt 源码位置
-	# ${CONFIG_FILE}			使用的配置文件名称
-	# ${FEEDS_CONF}			OpenWrt 源码目录下的 feeds.conf.default 文件
 	# ${CustomFiles}			仓库中的 /CustomFiles 绝对路径
 	# ${Scripts}				仓库中的 /Scripts 绝对路径
+
+	# ${WORK}				OpenWrt 源码目录
+	# ${FEEDS_CONF}			OpenWrt 源码目录下的 feeds.conf.default 文件
 	# ${FEEDS_LUCI}			OpenWrt 源码目录下的 package/feeds/luci 目录
 	# ${FEEDS_PKG}			OpenWrt 源码目录下的 package/feeds/packages 目录
 	# ${BASE_FILES}			OpenWrt 源码目录下的 package/base-files/files 目录
 
+	# AddPackage <package_path> <git_user> <git_repo> <git_branch>
+	# ClashDL <platform> <core_type> [dev/tun/meta]
+	# ReleaseDL <release_url> <file> <target_path>
+	# Copy <cp_from> <cp_to > <rename>
+	
 	case "${OP_AUTHOR}/${OP_REPO}:${OP_BRANCH}" in
 	coolsnowwolf/lede:master)
 		cat >> ${Version_File} <<EOF
@@ -85,11 +91,20 @@ EOF
 		;;
 		esac
 
+		case "${CONFIG_FILE}" in
+		d-team_newifi-d2-Clash | xiaoyu_xy-c5-Clash)
+			ClashDL mipsle-hardfloat dev
+		;;
+		esac
+			
 		case "${TARGET_PROFILE}" in
 		d-team_newifi-d2)
 			Copy ${CustomFiles}/${TARGET_PROFILE}_system ${BASE_FILES}/etc/config system
 		;;
 		x86_64)
+			ClashDL amd64 dev
+			ClashDL amd64 tun
+			ClashDL amd64 meta
 			Copy ${CustomFiles}/Depends/cpuset ${BASE_FILES}/bin
 			# AddPackage passwall-depends xiaorouji openwrt-passwall-packages main
 			# AddPackage passwall-luci xiaorouji openwrt-passwall main
@@ -98,7 +113,7 @@ EOF
 			#AddPackage lean Hyy2001X autocore-modify master
 			sed -i -- 's:/bin/ash:'/bin/bash':g' ${BASE_FILES}/etc/passwd
 
-			singbox_version="1.7.2"
+			singbox_version="1.8.1"
 			hysteria_version="2.2.3"
 			naiveproxy_version="119.0.6045.66-1"
 
@@ -108,8 +123,6 @@ EOF
 				https://github.com/apernet/hysteria/releases/download/app%2Fv${hysteria_version}/hysteria-linux-amd64
 			wget --quiet --no-check-certificate -P /tmp \
 				https://github.com/klzgrad/naiveproxy/releases/download/v${naiveproxy_version}/naiveproxy-v${naiveproxy_version}-openwrt-x86_64.tar.xz
-			wget --quiet --no-check-certificate -P /tmp \
-				https://raw.githubusercontent.com/vernesong/OpenClash/core/master/dev/clash-linux-amd64.tar.gz
 
 			tar -xvzf /tmp/sing-box-${singbox_version}-linux-amd64.tar.gz -C /tmp
 			Copy /tmp/sing-box-${singbox_version}-linux-amd64/sing-box ${BASE_FILES}/usr/bin
@@ -119,10 +132,7 @@ EOF
 			tar -xvf /tmp/naiveproxy-v${naiveproxy_version}-openwrt-x86_64.tar.xz -C /tmp
 			Copy /tmp/naiveproxy-v${naiveproxy_version}-openwrt-x86_64/naive ${BASE_FILES}/usr/bin
 
-			tar -xvzf /tmp/clash-linux-amd64.tar.gz -C /tmp
-			Copy /tmp/clash ${BASE_FILES}/etc/openclash/core
-
-			chmod 777 ${BASE_FILES}/usr/bin/sing-box ${BASE_FILES}/usr/bin/hysteria ${BASE_FILES}/usr/bin/naive ${BASE_FILES}/etc/openclash/core
+			chmod 777 ${BASE_FILES}/usr/bin/sing-box ${BASE_FILES}/usr/bin/hysteria ${BASE_FILES}/usr/bin/naive
 
 			# ReleaseDL https://api.github.com/repos/Loyalsoldier/v2ray-rules-dat/releases/latest geosite.dat ${BASE_FILES}/usr/v2ray
 			# ReleaseDL https://api.github.com/repos/Loyalsoldier/v2ray-rules-dat/releases/latest geoip.dat ${BASE_FILES}/usr/v2ray
@@ -137,13 +147,15 @@ EOF
 		case "${TARGET_PROFILE}" in
 		x86_64)
 			Copy ${CustomFiles}/Depends/cpuset ${BASE_FILES}/bin
+			sed -i "s?/bin/login?/usr/libexec/login.sh?g" ${FEEDS_PKG}/ttyd/files/ttyd.config
 			sed -i -- 's:/bin/ash:'/bin/bash':g' ${BASE_FILES}/etc/passwd
 			AddPackage passwall2-luci xiaorouji openwrt-passwall2 main
 			AddPackage other fw876 helloworld main
+			rm -r ${WORK}/package/other/helloworld/mosdns
+			rm -r ${FEEDS_PKG}/mosdns
 			AddPackage other sbwml luci-app-mosdns v5
 		;;
 		esac
-		sed -i "s?/bin/login?/usr/libexec/login.sh?g" ${FEEDS_PKG}/ttyd/files/ttyd.config
 	;;
 	padavanonly/immortalwrtARM*)
 		case "${TARGET_PROFILE}" in
