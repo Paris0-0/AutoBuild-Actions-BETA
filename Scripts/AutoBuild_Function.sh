@@ -5,21 +5,20 @@
 Firmware_Diy_Start() {
 	ECHO "[Firmware_Diy_Start] Starting ..."
 	WORK="${GITHUB_WORKSPACE}/openwrt"
-	CONFIG_TEMP="${GITHUB_WORKSPACE}/openwrt/.config"
+	CONFIG_TEMP="${WORK}/.config"
 	CD ${WORK}
+	OP_REPO="$(basename $(cut -d ':' -f1 <<< ${DEFAULT_SOURCE}))"
+	OP_AUTHOR="$(cut -d '/' -f1 <<< ${DEFAULT_SOURCE})"
+	OP_BRANCH="$(cut -d ':' -f2 <<< ${DEFAULT_SOURCE})"
 	Firmware_Diy_Core
 	[[ ${Short_Fw_Date} == true ]] && Compile_Date="$(cut -c1-8 <<< ${Compile_Date})"
-	Github="$(grep "https://github.com/[a-zA-Z0-9]" ${GITHUB_WORKSPACE}/.git/config | cut -c8-100 | sed 's/^[ \t]*//g')"
-	[[ -z ${Author} || ${Author} == AUTO ]] && Author="$(cut -d "/" -f4 <<< ${Github})"
-	OP_AUTHOR="$(cut -d "/" -f4 <<< ${REPO_URL})"
-	OP_REPO="$(cut -d "/" -f5 <<< ${REPO_URL})"
-	OP_BRANCH="$(Get_Branch)"
+	Github="$(egrep -o 'https://github.com/.+' ${GITHUB_WORKSPACE}/.git/config | awk 'NR==1')"
+	[[ -z ${Author} || ${Author} == AUTO ]] && Author="$(cut -d "/" -f4 <<< ${Github} | awk 'NR==1')"
 	if [[ ${OP_BRANCH} =~ (master|main) ]]
 	then
 		OP_VERSION_HEAD="R$(date +%y.%m)-"
 	else
-		OP_BRANCH="$(egrep -o "[0-9]+.[0-9]+" <<< ${OP_BRANCH} | awk 'NR==1')"
-		OP_VERSION_HEAD="R${OP_BRANCH}-"
+		OP_VERSION_HEAD="R$(egrep -o "[0-9]+.[0-9]+" <<< ${OP_BRANCH} | awk 'NR==1')-"
 	fi
 	case "${OP_AUTHOR}/${OP_REPO}" in
 	coolsnowwolf/lede)
@@ -27,7 +26,7 @@ Firmware_Diy_Start() {
 		zzz_Default_Version="$(egrep -o "R[0-9]+\.[0-9]+\.[0-9]+" ${Version_File})"
 		OP_VERSION="${zzz_Default_Version}-${Compile_Date}"
 	;;
-	immortalwrt/immortalwrt | padavanonly/immortalwrtARM)
+	immortalwrt/immortalwrt | padavanonly/immortalwrtARM | hanwckf/immortalwrt-mt798x)
 		Version_File=package/base-files/files/etc/openwrt_release
 		OP_VERSION="${OP_VERSION_HEAD}${Compile_Date}"
 	;;
@@ -35,7 +34,8 @@ Firmware_Diy_Start() {
 		OP_VERSION="${OP_VERSION_HEAD}${Compile_Date}"
 	;;
 	esac
-	while [[ -z ${x86_Test} ]];do
+	while [[ -z ${x86_Test} ]]
+	do
 		x86_Test="$(egrep -o "CONFIG_TARGET.*DEVICE.*=y" ${CONFIG_TEMP} | sed -r 's/CONFIG_TARGET_(.*)_DEVICE_(.*)=y/\1/')"
 		[[ -n ${x86_Test} ]] && break
 		x86_Test="$(egrep -o "CONFIG_TARGET.*Generic=y" ${CONFIG_TEMP} | sed -r 's/CONFIG_TARGET_(.*)_Generic=y/\1/')"
@@ -47,7 +47,6 @@ Firmware_Diy_Start() {
 	else
 		TARGET_PROFILE="$(egrep -o "CONFIG_TARGET.*DEVICE.*=y" ${CONFIG_TEMP} | sed -r 's/.*DEVICE_(.*)=y/\1/')"
 	fi
-	[[ -z ${TARGET_PROFILE} ]] && ECHO "Unable to get [TARGET_PROFILE] !"
 	TARGET_BOARD="$(awk -F '[="]+' '/TARGET_BOARD/{print $2}' ${CONFIG_TEMP})"
 	TARGET_SUBTARGET="$(awk -F '[="]+' '/TARGET_SUBTARGET/{print $2}' ${CONFIG_TEMP})"
 	if [[ -z ${Fw_MFormat} || ${Fw_MFormat} == AUTO ]]
@@ -114,17 +113,8 @@ Fw_MFormat=${Fw_MFormat}
 FEEDS_CONF=${WORK}/feeds.conf.default
 Author_URL=${Author_URL}
 ENV_FILE=${GITHUB_ENV}
+Compile_Date=${Compile_Date}
 
-EOF
-	source ${GITHUB_ENV}
-	echo -e "### VARIABLE LIST ###\n$(cat ${GITHUB_ENV})\n"
-	ECHO "[Firmware_Diy_Start] Done"
-}
-
-Firmware_Diy_Main() {
-	ECHO "[Firmware_Diy_Main] Starting ..."
-	CD ${WORK}
-	cat >> ${GITHUB_ENV} <<EOF
 Author=${Author}
 Github=${Github}
 TARGET_PROFILE=${TARGET_PROFILE}
@@ -135,8 +125,15 @@ OP_VERSION=${OP_VERSION}
 OP_AUTHOR=${OP_AUTHOR}
 OP_REPO=${OP_REPO}
 OP_BRANCH=${OP_BRANCH}
-
 EOF
+	echo -e "### VARIABLE LIST ###\n$(cat ${GITHUB_ENV})\n"
+	source ${GITHUB_ENV}
+	ECHO "[Firmware_Diy_Start] Done"
+}
+
+Firmware_Diy_Main() {
+	ECHO "[Firmware_Diy_Main] Starting ..."
+	CD ${WORK}
 	chmod 777 -R ${Scripts} ${CustomFiles}
 	if [[ ${AutoBuild_Features} == true ]]
 	then
@@ -170,8 +167,8 @@ EOF
 				sed -i "s?${zzz_Default_Version}?${zzz_Default_Version} @ ${Author} [${Display_Date}]?g" ${Version_File}
 			fi
 		;;
-		immortalwrt/immortalwrt | padavanonly/immortalwrtARM)
-			Copy ${CustomFiles}/Depends/openwrt_release_${OP_AUTHOR} ${BASE_FILES}/etc openwrt_release
+		immortalwrt/immortalwrt | padavanonly/immortalwrtARM | hanwckf/immortalwrt-mt798x)
+			Copy ${CustomFiles}/Depends/openwrt_release_immortalwrt ${BASE_FILES}/etc openwrt_release
 			if [[ -n ${TARGET_FLAG} ]]
 			then
 				sed -i "s?ImmortalWrt?ImmortalWrt ${TARGET_FLAG} @ ${Author} [${Display_Date}]?g" ${Version_File}
@@ -245,6 +242,9 @@ EOF
 			;;
 			padavanonly/immortalwrtARM*)
 				Patch_Path=${CustomFiles}/Patches/padavanonly-immortalwrtARM
+			;;
+			hanwckf/immortalwrt-mt798x*)
+				Patch_Path=${CustomFiles}/Patches/immortalwrt-mt798x
 			;;
 			esac
 			if [[ -d ${Patch_Path} ]]
@@ -419,12 +419,6 @@ List_MFormat() {
 
 Get_sha256() {
 	List_sha256 | grep $1 | awk '{print $1}' | cut -c1-5
-}
-
-Get_Branch() {
-    git -C $(pwd) rev-parse --abbrev-ref HEAD | grep -v HEAD || \
-    git -C $(pwd) describe --exact-match HEAD || \
-    git -C $(pwd) rev-parse HEAD
 }
 
 gz_Check() {
@@ -657,4 +651,35 @@ ClashDL() {
 		ECHO "CORE Size: $(du -h ${BASE_FILES}/etc/openclash/core/clash_tun)"
 	;;
 	esac
+}
+
+function merge_package(){
+	# Third-party function
+	# From https://github.com/coolsnowwolf/lede/issues/11757#issuecomment-1892195201
+
+    # 参数1是分支名,参数2是库地址,参数3是所有文件下载到指定路径
+    # 同一个仓库下载多个文件夹直接在后面跟文件名或路径,空格分开
+	# eg: merge_package master https://github.com/WYC-2020/openwrt-packages package/openwrt-packages luci-app-eqos luci-app-openclash luci-app-ddnsto ddnsto 
+	# eg: merge_package master https://github.com/lisaac/luci-app-dockerman package/lean applications/luci-app-dockerman
+	
+	if [[ $# -lt 3 ]]
+	then
+		ECHO "Syntax error: [$#] [$*]"
+		return 0
+	fi
+	
+    trap 'rm -rf "$tmpdir"' EXIT
+    branch="$1" curl="$2" target_dir="$3" && shift 3
+    rootdir="${WORK}"
+    localdir="$target_dir"
+    [ -d "$localdir" ] || mkdir -p "$localdir"
+    tmpdir="$(mktemp -d)" || exit 1
+    git clone -b "$branch" --depth 1 --filter=blob:none --sparse "$curl" "$tmpdir"
+    cd "$tmpdir"
+    git sparse-checkout init --cone
+    git sparse-checkout set "$@"
+    for folder in "$@"; do
+        mv -f "$folder" "$rootdir/$localdir"
+    done
+	cd - > /dev/null
 }
