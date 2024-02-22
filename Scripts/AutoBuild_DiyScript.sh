@@ -97,6 +97,7 @@ EOF
 		AddPackage other UnblockNeteaseMusic luci-app-unblockneteasemusic
 		AddPackage other iwrt luci-app-ikoolproxy main
 		AddPackage other pymumu luci-app-smartdns lede
+  		AddPackage other UnblockNeteaseMusic luci-app-unblockneteasemusic js
 
 		AddPackage other vernesong OpenClash dev
 		AddPackage other jerrykuku luci-app-argon-config master
