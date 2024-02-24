@@ -94,10 +94,9 @@ EOF
 		rm -r ${FEEDS_LUCI}/luci-theme-argon*
 		AddPackage themes jerrykuku luci-theme-argon 18.06
 		AddPackage themes garypang13 luci-theme-edge 18.06
-		AddPackage other UnblockNeteaseMusic luci-app-unblockneteasemusic
 		AddPackage other iwrt luci-app-ikoolproxy main
 		AddPackage other pymumu luci-app-smartdns lede
-  		AddPackage other UnblockNeteaseMusic luci-app-unblockneteasemusic js
+  		AddPackage other UnblockNeteaseMusic luci-app-unblockneteasemusic master
 
 		AddPackage other vernesong OpenClash dev
 		AddPackage other jerrykuku luci-app-argon-config master
