@@ -143,7 +143,7 @@ EOF
 			ClashDL amd64 meta
 			AddPackage passwall xiaorouji openwrt-passwall-packages main
 			AddPackage passwall xiaorouji openwrt-passwall main
-			# AddPackage passwall xiaorouji openwrt-passwall2 main
+			AddPackage passwall xiaorouji openwrt-passwall2 main
 			rm -r ${WORK}/package/passwall/openwrt-passwall-packages/xray-core
 			rm -r ${WORK}/package/passwall/openwrt-passwall-packages/xray-plugin
 			# rm -rf packages/lean/autocore
